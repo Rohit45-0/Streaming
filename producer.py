@@ -6,36 +6,35 @@ from confluent_kafka import Producer
 # Kafka producer configuration (AWS MSK brokers)
 producer = Producer({
     'bootstrap.servers': 'b-3.kafka02.diqfpt.c2.kafka.ap-south-1.amazonaws.com:9094',
-    'security.protocol': 'SSL'  # Ensure MSK uses SSL
+    'security.protocol': 'SSL',  # Ensure MSK uses SSL
+    'ssl.ca.location': '/etc/ssl/certs/ca-cert.pem'  # Path to your CA cert
 })
 
 # Read the CSV file
 try:
     df = pd.read_csv("test_df.csv")
 except FileNotFoundError:
-    print("CSV file not found.")
+    print("❌ CSV file not found.")
     exit(1)
 except pd.errors.EmptyDataError:
-    print("CSV file is empty.")
+    print("❌ CSV file is empty.")
     exit(1)
 
-# Send each row as a JSON message to Kafka with a delay
+# Send each row as a JSON message to Kafka
 for _, row in df.iterrows():
     try:
-        # Convert row to a dictionary
         row_dict = row.to_dict()
-
-        # Convert dictionary to a JSON string
         message = json.dumps(row_dict)
 
-        # Send to Kafka topic 'transaction-topic'
+        # Send message to Kafka topic
         producer.produce('transaction-topic', value=message)
         producer.flush()
 
-        # Delay to control message rate
-        time.sleep(1)
+        print(f"📤 Sent message: {message}")
+
+        time.sleep(1)  # Delay to control message rate
 
     except Exception as e:
-        print(f"Error sending row: {e}")
+        print(f"❌ Error sending row: {e}")
 
 print("✅ Data sent to Kafka successfully.")
