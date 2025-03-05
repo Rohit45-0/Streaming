@@ -6,6 +6,7 @@ from confluent_kafka import Consumer, KafkaException, KafkaError
 consumer = Consumer({
     'bootstrap.servers': 'b-3.kafka02.diqfpt.c2.kafka.ap-south-1.amazonaws.com:9094',
     'security.protocol': 'SSL',  # Ensure MSK uses SSL
+    'ssl.ca.location': '/etc/ssl/certs/ca-cert.pem',  # Path to your CA cert
     'group.id': 'test-group',
     'auto.offset.reset': 'earliest'
 })
