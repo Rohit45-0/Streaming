@@ -5,7 +5,7 @@ from confluent_kafka import Producer
 
 # Kafka producer configuration (AWS MSK brokers)
 producer = Producer({
-    'bootstrap.servers': 'b-2.kafkacluster.uy165v.c2.kafka.ap-south-1.amazonaws.com:9098',
+    'bootstrap.servers': 'b-3.kafka02.diqfpt.c2.kafka.ap-south-1.amazonaws.com:9094',
     'security.protocol': 'SSL'  # Ensure MSK uses SSL
 })
 
