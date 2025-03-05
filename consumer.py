@@ -4,7 +4,7 @@ from confluent_kafka import Consumer, KafkaException, KafkaError
 
 # Kafka consumer configuration (AWS MSK brokers)
 consumer = Consumer({
-    'bootstrap.servers': 'b-2.kafkacluster.uy165v.c2.kafka.ap-south-1.amazonaws.com:9098',
+    'bootstrap.servers': 'b-3.kafka02.diqfpt.c2.kafka.ap-south-1.amazonaws.com:9094',
     'security.protocol': 'SSL',  # Ensure MSK uses SSL
     'group.id': 'test-group',
     'auto.offset.reset': 'earliest'
