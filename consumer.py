@@ -2,13 +2,12 @@ import json
 import requests
 from confluent_kafka import Consumer, KafkaException, KafkaError
 
-# Kafka consumer configuration (AWS MSK brokers)
+# Kafka consumer configuration for AWS MSK
 consumer = Consumer({
-    'bootstrap.servers': 'b-3.kafka02.diqfpt.c2.kafka.ap-south-1.amazonaws.com:9094',
-    'security.protocol': 'SSL',  # Ensure MSK uses SSL
-    'ssl.ca.location': '/etc/ssl/certs/ca-cert.pem',  # Path to your CA cert
+    'bootstrap.servers': 'b-1.kafkacluster.uy165v.c2.kafka.ap-south-1.amazonaws.com:9098',
     'group.id': 'test-group',
-    'auto.offset.reset': 'earliest'
+    'auto.offset.reset': 'earliest',
+    'security.protocol': 'SSL'  # If MSK requires SSL
 })
 
 # Subscribe to the Kafka topic
@@ -18,10 +17,10 @@ print("🎧 Listening to Kafka topic 'transaction-topic'...")
 
 try:
     while True:
-        msg = consumer.poll(1.0)
+        msg = consumer.poll(1.0)  # Poll for a message with a timeout of 1 sec
 
         if msg is None:
-            continue  # No message received, continue polling
+            continue
 
         if msg.error():
             if msg.error().code() == KafkaError._PARTITION_EOF:
@@ -30,17 +29,16 @@ try:
                 raise KafkaException(msg.error())
         else:
             try:
-                # Decode the message
                 message_value = msg.value().decode('utf-8')
                 json_data = json.loads(message_value)
 
-                print(f"📩 Received message: {json_data}")
+                print(f"✅ Received message: {json_data}")
 
-                # Send this data to FastAPI model for prediction
+                # Send this data to the FastAPI endpoint
                 response = requests.post('http://13.201.168.92:8000/predict', json=json_data)
 
                 if response.status_code == 200:
-                    print(f"✅ Prediction result: {response.json()}")
+                    print(f"🔹 Prediction result: {response.json()}")
                 else:
                     print(f"❌ Error from FastAPI: {response.status_code}")
 
