@@ -1,17 +1,14 @@
-import pandas as pd
 import json
 import time
+import pandas as pd
 from confluent_kafka import Producer
 
-# Kafka producer configuration for AWS MSK
-producer = Producer({
-    'bootstrap.servers': 'b-1.kafkacluster.uy165v.c2.kafka.ap-south-1.amazonaws.com:9098',
-    'security.protocol': 'SSL'  # If your MSK cluster requires SSL
-})
+# Kafka producer configuration
+producer = Producer({'bootstrap.servers': 'b-2.kafka01.6xrdlj.c2.kafka.ap-south-1.amazonaws.com:9092'})
 
 # Read the CSV file
 try:
-    df = pd.read_csv("test_df.csv")
+    df = pd.read_csv("test_df.csv")  # Ensure the CSV file exists in the same directory
 except FileNotFoundError:
     print("CSV file not found.")
     exit(1)
@@ -19,18 +16,15 @@ except pd.errors.EmptyDataError:
     print("CSV file is empty.")
     exit(1)
 
-# Send each row as a JSON message to Kafka with a delay of 1 second
+# Send each row as a JSON message to Kafka
 for _, row in df.iterrows():
     try:
-        row_dict = row.to_dict()
-        message = json.dumps(row_dict)
-
+        message = json.dumps(row.to_dict())  # Convert row to JSON
         producer.produce('transaction-topic', value=message)
         producer.flush()
-
-        time.sleep(1)  # Sleep for 1 second before sending the next row
-
+        print(f"Sent: {message}")
+        time.sleep(1)  # Delay of 1 second
     except Exception as e:
         print(f"Error sending row: {e}")
 
-print("✅ Data sent to Kafka successfully.")
+print("Data sent to Kafka successfully.")
